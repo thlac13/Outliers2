@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | Outliers</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <script src="TemplateData/UnityProgress.js"></script>
+    <script src="Build/UnityLoader.js"></script>
+
+    <script src="https://connect.facebook.net/en_US/fbinstant.6.1.js"></script>
+
+    <script>
+      var gameInstance;
+    FBInstant.initializeAsync().then(function() { 
+      gameInstance = UnityLoader.instantiate("gameContainer", "Build/testBuild.json", {onProgress: UnityProgress});
+       });
+       function RequestScore()
+       {
+       		FBInstant
+  			.getLeaderboardAsync('TopScores')
+  			.then(leaderboard => leaderboard.getEntriesAsync(10, 0))
+  			.then(entries => {
+  			if(entries.length>0)
+  			{
+  				
+  				gameInstance.SendMessage('Canvas','UpdateScore',entries[0].getScore());
+  				console.log(entries[0].getScore());
+  			}
+  		}).catch(error => console.error(error));
+
+       }
+
+     
+    </script>
+  </head>
+  <body>
+    <div class="webgl-content">
+      <div id="gameContainer" style="width: 960px; height: 600px"></div>
+      <div class="footer">
+        <div class="webgl-logo"></div>
+        <div class="fullscreen" onclick="gameInstance.SetFullscreen(1)"></div>
+        <div class="title">Outliers</div>
+      </div>
+    </div>
+  </body>
+</html>
