@@ -294,7 +294,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 709257410}
+      - m_Target: {fileID: 709257412}
         m_MethodName: submitAnswer1
         m_Mode: 1
         m_Arguments:
@@ -660,6 +660,8 @@ GameObject:
   m_Component:
   - component: {fileID: 709257411}
   - component: {fileID: 709257410}
+  - component: {fileID: 709257412}
+  - component: {fileID: 709257413}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -727,6 +729,72 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &709257412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 709257409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab9822f946b233640995080f9f8c0acb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  user:
+    name: 
+    vacation: 0
+    wasOutlier: 0
+    isQuestioner: 0
+  gameInfo:
+    gameCode: 
+    gameName: 
+    gameReady: 0
+    round: 0
+    question: 0
+    questPerRound: 0
+    playerNames: []
+    numPlayersAns: 0
+    questionerAskedQuest: 0
+    numOfPlayers: 0
+    maxNumPlayers: 0
+    allQuestionersResp: 0
+  questAndAns:
+    quest: 
+    answer1: 
+    answer2: 
+  userAnswers:
+    answer: 
+    hasAnswered: 1
+  textpull: {fileID: 0}
+  playerNameText: {fileID: 0}
+  questionText: {fileID: 0}
+  gameNameText: {fileID: 0}
+  getGameString: {fileID: 0}
+  questionAns1Input: {fileID: 0}
+  questionAns2Input: {fileID: 0}
+  maxPlayersText: {fileID: 0}
+  responseText: {fileID: 0}
+  lobbyText: {fileID: 0}
+  questionSceneQuestion: {fileID: 0}
+  questionSceneAns1: {fileID: 0}
+  questionSceneAns2: {fileID: 0}
+--- !u!114 &709257413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 709257409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 741e3e79a37383d4cb3a4b5102a38d5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  question: {fileID: 1916268510}
+  answerOne: {fileID: 885285617}
+  answerTwo: {fileID: 1119228784}
+  questioner: {fileID: 0}
 --- !u!1 &742063199
 GameObject:
   m_ObjectHideFlags: 0
@@ -806,7 +874,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 709257410}
+      - m_Target: {fileID: 709257412}
         m_MethodName: submitAnswer2
         m_Mode: 1
         m_Arguments:

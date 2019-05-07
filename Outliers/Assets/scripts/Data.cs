@@ -1,8 +1,9 @@
 public static class Data
 {
 	public static string gCode, gName, gPlayerName;
-	public static int gRound, gQuestNum, gQuestPerRound, gNumPlayersAns;
+	public static int gRound, gQuestNum, gQuestPerRound, gNumPlayersAns, gMaxPlayers;
 	public static bool gReady, gQuesterAskQuest;
+    public static string[] gPlayers;
 	
 	public static User gUser;
     public static GameInfo gInfo;

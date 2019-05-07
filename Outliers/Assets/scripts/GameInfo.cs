@@ -13,9 +13,12 @@ public class GameInfo
     public int round;
     public int question;
     public int questPerRound;
-    //public List<string> orderOfPlayers = new List<string>();
+    public String[] playerNames;
 	public int numPlayersAns;
 	public bool questionerAskedQuest;
+    public int numOfPlayers;
+    public int maxNumPlayers;
+    public bool allQuestionersResp;
 
 
     public GameInfo(string gameCode, string gameName)
@@ -28,6 +31,9 @@ public class GameInfo
         this.questPerRound = 0;
 		this.numPlayersAns = 0;
 		this.questionerAskedQuest = false;
+        this.numOfPlayers = 0;
+        this.maxNumPlayers = 0;
+        this.allQuestionersResp = false;
     }
 
     public string getCode()

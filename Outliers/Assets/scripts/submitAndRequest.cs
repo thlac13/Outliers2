@@ -22,11 +22,15 @@ public class submitAndRequest : MonoBehaviour
     public static int questionNum;
 	public static string questionAns1Text;
 	public static string questionAns2Text;
+    public static String[] players;
+    public static int maxPlayers;
+    public static int numPlayers;
 
     public User user;
     public GameInfo gameInfo;
 	public QuestionAnswer questAndAns;
 	public Answers userAnswers;
+    public TextPull textpull;
 	
     public InputField playerNameText;
     public InputField questionText;
@@ -34,6 +38,7 @@ public class submitAndRequest : MonoBehaviour
     public InputField getGameString;
 	public InputField questionAns1Input;
 	public InputField questionAns2Input;
+    public InputField maxPlayersText;
 
     public Text responseText;
 	public Text lobbyText;
@@ -73,7 +78,8 @@ public class submitAndRequest : MonoBehaviour
             responseText.text = "You need a player name";
         }else{
 			playerName = playerNameText.text;
-			responseText.text = "";
+            Data.gPlayerName = playerName;
+			responseText.text = "Welcome!";
             SceneManager.LoadScene("lobby");
         }
 	}
@@ -81,6 +87,7 @@ public class submitAndRequest : MonoBehaviour
     //When the submit button is pressed
     public void OnSubmitQuestion()
     {
+
         if (questionText.text == "" || questionAns1Input.text == "" || questionAns2Input.text == "")
         {
             responseText.text = "You need a question and two answers";
@@ -90,30 +97,32 @@ public class submitAndRequest : MonoBehaviour
             question = questionText.text; //sets value of text field
 			questionAns1Text = questionAns1Input.text;
 			questionAns2Text = questionAns2Input.text;
-            
-			if(roundNum == 1){
-				questAndAns = new QuestionAnswer(gameInfo.questPerRound);
-                //questAndAns.questions[1] = question;
-                //questAndAns.ans1[1] = questionAns1Text;
-                //questAndAns.ans2[1] = questionAns2Text;
-                questAndAns.quest = question;
-                questAndAns.answer1 = questionAns1Text;
-                questAndAns.answer2 = questionAns2Text;
-				RestClient.Put(urlFire+ "Sessions/" + gameString + "/Round1" + ".json",questAndAns);
-				gameInfo.questionerAskedQuest = true;
-				RestClient.Put(urlFire + "Sessions/" +gameString + "/GameInfo" + ".json", gameInfo);
-				
-			}else{
-				questAndAns.questions[roundNum] = question;
-				questAndAns.ans1[roundNum] = questionAns1Text;
-				questAndAns.ans2[roundNum] = questionAns2Text;
-				RestClient.Put(urlFire+ "Sessions/" + gameString + "/Round" + roundNum + ".json", questAndAns);
-                //gotolobby waiting room
-                gameInfo.questionerAskedQuest = true;
-				RestClient.Put(urlFire + "Sessions/" +gameString + "/GameInfo" + ".json", gameInfo);
 
-			}
-            //responseText.text = "Submited player " + playerName;
+            questAndAns = new QuestionAnswer();
+
+            questAndAns.quest = question;
+            questAndAns.answer1 = questionAns1Text;
+            questAndAns.answer2 = questionAns2Text;
+
+            if(gameInfo.question + 1 > gameInfo.questPerRound || gameInfo.round == 0)
+            {
+                gameInfo.question = 1;
+                gameInfo.round = gameInfo.round + 1;
+            }
+            else
+            {
+                gameInfo.question = gameInfo.question + 1;
+            }
+
+            roundNum = gameInfo.round;
+            questionNum = gameInfo.question;
+
+            RestClient.Put(urlFire + "Sessions/" + gameString + "/Round" + roundNum + "/Question" + questionNum +".json", questAndAns);
+            gameInfo.questionerAskedQuest = true;
+            gameInfo.allQuestionersResp = false;
+            RestClient.Put(urlFire + "Sessions/" + gameString + "/GameInfo" + ".json", gameInfo);
+            Data.gInfo = gameInfo;
+
             SceneManager.LoadScene("outliersLobbyPlayers");
         }
         else
@@ -123,19 +132,7 @@ public class submitAndRequest : MonoBehaviour
             
     }
 
-    /*public void OnGetQuestion()
-    {
-        if (playerNameText.text == "")
-        {
-            responseText.text = "You need to have a player name";
-        }
-        else
-        {
-            playerName = playerNameText.text;
-            RetrieveFromDataBase();
-        }
-    }
-    */
+   
     public void SwitchVacMode()
     {
         if (playerVac) {
@@ -151,7 +148,7 @@ public class submitAndRequest : MonoBehaviour
     {
         if (gameNameText.text == "")
         {
-            responseText.text = "You need to have a game name";
+            responseText.text = "You need to have a game name and max players";
         }
         else
         {
@@ -160,16 +157,22 @@ public class submitAndRequest : MonoBehaviour
             gameName = gameNameText.text;
 			Data.gName = gameName;
             gameInfo = new GameInfo(gameString, gameName);
+            maxPlayers = Int32.Parse(maxPlayersText.text);
+            Data.gMaxPlayers = maxPlayers;
+            gameInfo.maxNumPlayers = maxPlayers;
+            players = new string[maxPlayers - 1];
+            players[0] = playerName;
+            gameInfo.playerNames = players;
+            Data.gPlayers = players;
+            gameInfo.numOfPlayers = 1;
+
 			Data.gInfo = gameInfo;
-			//gameInfo.orderOfPlayers.Add(playerName);
-            //gameInfo.gameCode = gameString;
-            //gameInfo.gameName = gameName;
+
             RestClient.Put(urlFire + "Sessions/" +gameString + "/GameInfo" + ".json", gameInfo);
 			user = new User();
-			RestClient.Put(urlFire+ "Sessions/" + gameString + "/User/" + playerName + ".json",user);
+			RestClient.Put(urlFire+ "Sessions/" + gameString + "/Users/" + playerName + ".json",user);
             responseText.text = "Use this code to invite your friends:   " + gameString;
-			
-			//add a button press of put the code in the next scene
+		
             SceneManager.LoadScene("startGame");
         }
             
@@ -178,27 +181,22 @@ public class submitAndRequest : MonoBehaviour
     public void StartGame()
     {
         gameInfo.gameReady = true;
+        Data.gInfo = gameInfo;
 		Data.gReady = true;
-		gameInfo.round = 1;
-		Data.gRound = 1;
-		gameInfo.question = 1;
-		Data.gQuestNum = 1;
-		roundNum = 1;
-		questionNum = 1;
-        /*if(gameInfo.orderOfPlayers.Count <= 9)
+        if(gameInfo.maxNumPlayers <= 9)
 		{
 			gameInfo.questPerRound = 2;
-		}else if (gameInfo.orderOfPlayers.Count <= 17)
+		}else if (gameInfo.maxNumPlayers <= 17)
 		{
 			gameInfo.questPerRound = 3;
-		}else if (gameInfo.orderOfPlayers.Count <= 33)
+		}else if (gameInfo.maxNumPlayers <= 33)
 		{
 			gameInfo.questPerRound = 4;
 		} else {
 			//double minus 1
 			gameInfo.questPerRound = 5;
-		}*/
-        gameInfo.questPerRound = 2;
+		}
+        
         RestClient.Put(urlFire + "Sessions/" + gameString + "/GameInfo" + ".json", gameInfo);
         //responseText.text = "You have started a game";
         SceneManager.LoadScene("outliersQuestionMaker");
@@ -214,6 +212,7 @@ public class submitAndRequest : MonoBehaviour
         {
             gameString = getGameString.text;
 			Data.gCode = gameString;
+            Debug.Log("Join was hit");
 
             RestClient.Get<GameInfo>(urlFire + "Sessions/" + gameString + "/GameInfo" + ".json").Then(onResolved: response =>
             {
@@ -221,59 +220,103 @@ public class submitAndRequest : MonoBehaviour
 				Data.gInfo = gameInfo;
                 gameName = gameInfo.getName();
 				Data.gName = gameName;
+                Debug.Log("in the get request");
 				
 				//Maybe put text in next screene saying you joined the game
-                responseText.text = "You have joined game " + gameName;
+                //responseText.text = "You have joined game " + gameName;
+                Debug.Log("Joined game");
+                sendJoin();
             
             });
 			
-			if(gameInfo.gameReady){
-                RestClient.Get<User>(urlFire + "Sessions/" + gameString + "/User/" + playerName + ".json").Then(onResolved: response =>
-                 {
-                     user = response;
-					 Data.gUser = user;
-                 });
-			}else{
-				user = new User();
-				Data.gUser = user;
-				//gameInfo.orderOfPlayers.Add(playerName);
-				RestClient.Put(urlFire + "Sessions/" +gameString + "/GameInfo" + ".json", gameInfo);
-				RestClient.Put(urlFire+ "Sessions/" + gameString + "/User/" + playerName + ".json",user);
-                SceneManager.LoadScene("outliersLobbyPlayers");
-                //lobbyText.text = "Waiting for Players...";
-			}
+			
         }
         
     }
- 
-    public void submitAnswer1(){
-		if (roundNum==1){
-			userAnswers = new Answers(gameInfo.questPerRound);
-			userAnswers.answers[1] = questAndAns.ans1[1];
-			RestClient.Put(urlFire+ "Sessions/" + gameString + "/User/" + playerName + "/Round1" +".json",userAnswers);
-		}else{
-			userAnswers = new Answers(gameInfo.questPerRound);
-			userAnswers.answers[roundNum] = questAndAns.ans1[roundNum];
-			RestClient.Put(urlFire+ "Sessions/" + gameString + "/User/" + playerName + "/Round" + roundNum +".json",userAnswers);
-		}
-        SceneManager.LoadScene("outliersLobbyPlayers");
+
+    private bool sendJoin()
+    {
+        if (gameInfo.gameReady)
+        {
+            RestClient.Get<User>(urlFire + "Sessions/" + gameString + "/Users/" + playerName + ".json").Then(onResolved: response =>
+            {
+                user = response;
+                Data.gUser = user;
+            });
+        }
+        else
+        {
+            user = new User();
+            Data.gUser = user;
+            gameInfo.playerNames[gameInfo.numOfPlayers] = playerName;
+            gameInfo.numOfPlayers = gameInfo.numOfPlayers + 1;
+            Data.gInfo = gameInfo;
+
+            RestClient.Put(urlFire + "Sessions/" + gameString + "/GameInfo" + ".json", gameInfo);
+            RestClient.Put(urlFire + "Sessions/" + gameString + "/Users/" + playerName + ".json", user);
+            SceneManager.LoadScene("outliersLobbyPlayers");
+            //lobbyText.text = "Waiting for Players...";
+        }
+        return true;
+    }
+
+    public void submitAnswer1() {
+
+        roundNum = gameInfo.round;
+        questionNum = gameInfo.question;
+
+        userAnswers = new Answers();
+        userAnswers.answer = questAndAns.answer1;
+
+        RestClient.Put(urlFire + "Sessions/" + gameString + "/Round" + roundNum + "/Question" + questionNum + "/Users/" + playerName +".json", userAnswers);
+
+        RestClient.Get<GameInfo>(urlFire + "Sessions/" + gameString + "/GameInfo" + ".json").Then(onResolved: response =>
+        {
+            gameInfo = response;
+
+            gameInfo.numPlayersAns = gameInfo.numPlayersAns + 1;
+            if(gameInfo.numPlayersAns == gameInfo.numOfPlayers - 1)
+            {
+                gameInfo.numPlayersAns = 0;
+                gameInfo.allQuestionersResp = true;
+            }
+
+            RestClient.Put(urlFire + "Sessions/" + gameString + "/GameInfo" + ".json", gameInfo);
+            Data.gInfo = gameInfo;
+
+
+            SceneManager.LoadScene("outliersLobbyPlayers");
+        });
+
     }
 
     public void submitAnswer2()
     {
-        if (roundNum == 1)
+        roundNum = gameInfo.round;
+        questionNum = gameInfo.question;
+
+        userAnswers = new Answers();
+        userAnswers.answer = questAndAns.answer2;
+
+        RestClient.Put(urlFire + "Sessions/" + gameString + "/Round" + roundNum + "/Question" + questionNum + "/Users/" + playerName + ".json", userAnswers);
+
+        RestClient.Get<GameInfo>(urlFire + "Sessions/" + gameString + "/GameInfo" + ".json").Then(onResolved: response =>
         {
-            userAnswers = new Answers(gameInfo.questPerRound);
-            userAnswers.answers[1] = questAndAns.ans2[1];
-            RestClient.Put(urlFire + "Sessions/" + gameString + "/User/" + playerName + "/Round1" + ".json", userAnswers);
-        }
-        else
-        {
-            userAnswers = new Answers(gameInfo.questPerRound);
-            userAnswers.answers[roundNum] = questAndAns.ans2[roundNum];
-            RestClient.Put(urlFire + "Sessions/" + gameString + "/User/" + playerName + "/Round" + roundNum + ".json", userAnswers);
-        }
-        SceneManager.LoadScene("outliersLobbyPlayers");
+            gameInfo = response;
+
+            gameInfo.numPlayersAns = gameInfo.numPlayersAns + 1;
+            if (gameInfo.numPlayersAns == gameInfo.numOfPlayers - 1)
+            {
+                gameInfo.numPlayersAns = 0;
+                gameInfo.allQuestionersResp = true;
+            }
+
+            RestClient.Put(urlFire + "Sessions/" + gameString + "/GameInfo" + ".json", gameInfo);
+            Data.gInfo = gameInfo;
+
+
+            SceneManager.LoadScene("outliersLobbyPlayers");
+        });
     }
 
 
@@ -312,6 +355,7 @@ public class submitAndRequest : MonoBehaviour
         return builder.ToString();
     }
 	
+    /*
 	private void goToLobby(){
         //get in the lobby scene
         bool ready = false;
@@ -340,17 +384,80 @@ public class submitAndRequest : MonoBehaviour
 			//go to question scene
 		}
 	}
+    */
 
     public void refresh()
     {
         RestClient.Get<GameInfo>(urlFire + "Sessions/" + gameString + "/GameInfo" + ".json").Then(onResolved: response =>
         {
             gameInfo = response;
-            if (gameInfo.questionerAskedQuest)
+            Data.gInfo = gameInfo;
+
+            if (gameInfo.gameReady)
             {
-                SceneManager.LoadScene("outliersAsker");
+                if (areQuestioner())
+                {
+                    SceneManager.LoadScene("outliersQuestionMaker");
+                }
+                else
+                { 
+                    if (gameInfo.questionerAskedQuest)
+                    {
+                        getAnswer(); 
+                    }
+                    else
+                    {
+                        //no new info, maybe put that
+                    }
+                }
             }
+
         });
+    }
+
+    private void getAnswer()
+    {
+        questAndAns = new QuestionAnswer();
+
+        RestClient.Get<QuestionAnswer>(urlFire + "Sessions/" + gameString + "/Round" +gameInfo.round + "/Question" + gameInfo.question + ".json").Then(onResolved: response =>
+        {
+            Data.gQuestAndAns = response;
+
+            SceneManager.LoadScene("outliersAsker");
+        });
+    }
+
+    private bool areQuestioner()
+    {
+        if (gameInfo.allQuestionersResp)
+        {
+            if (gameInfo.question + 1 > gameInfo.questPerRound)
+            {
+                if (gameInfo.playerNames[gameInfo.round + 1] == playerName)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (gameInfo.playerNames[gameInfo.round] == playerName)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
 	
 	private bool seeIfReady()

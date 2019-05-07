@@ -6,23 +6,23 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/enterName.unity
+    guid: 57e32ff2d9ec9cf42928876d4f6bfe15
+  - enabled: 1
     path: Assets/Scenes/lobby.unity
     guid: 96b7e41040c8145d7a908fe524fb20f8
   - enabled: 1
     path: Assets/Scenes/outliersQuestionMaker.unity
     guid: 27706d68bc5c09a4087a2167e71c5add
   - enabled: 0
-    path: Assets/Scenes/home.unity
-    guid: 88f277d25e3424c7c8c19cfd77d64f73
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/Scenes/Answers.unity
     guid: 8d3c6c62b2e964706ba0480a5a27f8fc
   - enabled: 1
     path: Assets/Scenes/create.unity
     guid: 0dbbcc5a51eb83a4bb111a693461a9ff
-  - enabled: 1
-    path: Assets/Scenes/enterName.unity
-    guid: 57e32ff2d9ec9cf42928876d4f6bfe15
   - enabled: 1
     path: Assets/Scenes/outliersAsker.unity
     guid: 9f4bd89b53a5d834fb6d759fa4c137d3

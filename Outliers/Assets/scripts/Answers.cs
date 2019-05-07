@@ -7,12 +7,12 @@ using UnityEngine;
 [Serializable]
 public class Answers
 {
-	public string[] answers;
-    //public string quest;
+	public string answer;
+    public bool hasAnswered = true;
 	
-	  public Answers(int size /*string str*/)
+	  public Answers()
     {
-		this.answers = new string[size];
+		//this.answers = new string[size];
         //this.quest = str;
 	}
 }

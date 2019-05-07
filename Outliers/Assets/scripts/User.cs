@@ -12,7 +12,6 @@ public class User
     public bool vacation;
     public bool wasOutlier;
     public bool isQuestioner;
-    //public Character character;
 
     public User ()
     {
@@ -21,8 +20,7 @@ public class User
         vacation = submitAndRequest.playerVac;
         this.wasOutlier = false;
         this.isQuestioner = false;
-        //character.charname = character.RandomChar();
-        
+
     }
 
 }
